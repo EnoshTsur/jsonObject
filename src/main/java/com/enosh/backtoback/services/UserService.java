@@ -1,10 +1,14 @@
-package com.enosh.backtoback.common;
+package com.enosh.backtoback.services;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+import java.util.Map;
+
+import static com.enosh.backtoback.services.UserConstants.*;
 import static org.springframework.http.HttpMethod.GET;
 
 @Service
@@ -13,19 +17,12 @@ public class UserService {
     @Value("${service-url}")
     private String serviceUrl;
 
-    private final String RESULTS = "results";
-    private final String NAME = "name";
-    private final String FIRST = "first";
-    private final String LAST = "last";
-    private final String PICTURE = "picture";
-    private final String MEDIUM = "medium";
-
     private final RestTemplate restTemplate;
 
-    private final JSONObject results;
+    private JSONObject results;
 
-    public UserService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    @PostConstruct
+    private void init(){
         this.results = new JSONObject(
                 restTemplate.exchange(
                         serviceUrl,
@@ -38,19 +35,39 @@ public class UserService {
                 .getJSONObject(0);
     }
 
+    public UserService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-    public String extractFullName() {
+    private String extractFullName() {
         JSONObject name = results.getJSONObject(NAME);
         return name.getString(FIRST) + " " + name.getString(LAST);
     }
 
-    public String getStringAttribute(String key) {
+    private String getStringAttribute(String key) {
         return results.getString(key);
     }
 
-    public String extractPicture() {
+    private String extractPicture() {
         return results
                 .getJSONObject(PICTURE)
                 .getString(MEDIUM);
+    }
+
+    private JSONObject getLocation() {
+        return results.getJSONObject(LOCATION);
+    }
+
+    private JSONObject extractStreet() {
+        return getLocation().getJSONObject(STREET);
+    }
+
+    public Map<String, String> getUserDetails() {
+        return Map.of(
+                NAME, extractFullName(),
+                GENDER, getStringAttribute(GENDER),
+                EMAIL, getStringAttribute(EMAIL),
+                PICTURE, extractPicture()
+        );
     }
 }
