@@ -23,22 +23,15 @@ public class UserController {
 
     @GetMapping("/get")
     public ResponseEntity<Map<String, String>> getData() {
-        JSONObject result = userService.getResult();
-
-        JSONObject name = result.getJSONObject("name");
-
         return ResponseEntity.ok(
                 Map.of(
-                        "name", extractFullName(name),
-                        "gender", result.getString("gender"),
-                        "email", result.getString("email"),
-                        "picture", result.getJSONObject("picture")
-                                .getString("medium")
+                        "name", userService.extractFullName(),
+                        "gender", userService.getStringAttribute("gender"),
+                        "email", userService.getStringAttribute("email"),
+                        "picture", userService.extractPicture()
                 )
         );
     }
 
-    private String extractFullName(JSONObject name) {
-        return name.getString("first") + " " + name.getString("last");
-    }
+
 }
