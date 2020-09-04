@@ -4,6 +4,7 @@ public interface UserConstants {
 
     String RESULTS = "results";
     String NAME = "name";
+    String NUMBER = "number";
     String GENDER = "gender";
     String EMAIL = "email";
     String FIRST = "first";
@@ -12,4 +13,8 @@ public interface UserConstants {
     String MEDIUM = "medium";
     String LOCATION = "location";
     String STREET = "street";
+    String STREET_NAME = "streetName";
+    String STREET_NUMBER = "streetNumber";
+    String CITY = "city";
+    String COUNTRY = "country";
 }

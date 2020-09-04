@@ -19,11 +19,8 @@ public class UserService {
 
     private final RestTemplate restTemplate;
 
-    private JSONObject results;
-
-    @PostConstruct
-    private void init(){
-        this.results = new JSONObject(
+    private JSONObject getResults() {
+        return new JSONObject(
                 restTemplate.exchange(
                         serviceUrl,
                         GET,
@@ -39,35 +36,41 @@ public class UserService {
         this.restTemplate = restTemplate;
     }
 
-    private String extractFullName() {
+    private String extractFullName(JSONObject results) {
         JSONObject name = results.getJSONObject(NAME);
         return name.getString(FIRST) + " " + name.getString(LAST);
     }
 
-    private String getStringAttribute(String key) {
+    private String getStringAttribute(JSONObject results, String key) {
         return results.getString(key);
     }
 
-    private String extractPicture() {
+    private String extractPicture(JSONObject results) {
         return results
                 .getJSONObject(PICTURE)
                 .getString(MEDIUM);
     }
 
-    private JSONObject getLocation() {
+    private JSONObject getLocation(JSONObject results) {
         return results.getJSONObject(LOCATION);
     }
 
-    private JSONObject extractStreet() {
-        return getLocation().getJSONObject(STREET);
+    private JSONObject extractStreet(JSONObject results) {
+        return getLocation(results).getJSONObject(STREET);
     }
 
     public Map<String, String> getUserDetails() {
+        JSONObject results = getResults();
+
         return Map.of(
-                NAME, extractFullName(),
-                GENDER, getStringAttribute(GENDER),
-                EMAIL, getStringAttribute(EMAIL),
-                PICTURE, extractPicture()
+                NAME, extractFullName(results),
+                GENDER, getStringAttribute(results, GENDER),
+                EMAIL, getStringAttribute(results, EMAIL),
+                PICTURE, extractPicture(results),
+                STREET_NAME, extractStreet(results).getString(NAME),
+                STREET_NUMBER, String.valueOf(extractStreet(results).getInt(NUMBER)),
+                CITY, getLocation(results).getString(CITY),
+                COUNTRY, getLocation(results).getString(COUNTRY)
         );
     }
 }
