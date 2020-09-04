@@ -21,7 +21,7 @@ public class UserService {
         this.restTemplate = restTemplate;
     }
 
-    private JSONObject getResult() {
+    public JSONObject getResult() {
         return new JSONObject(
                 restTemplate.exchange(
                         serviceUrl,

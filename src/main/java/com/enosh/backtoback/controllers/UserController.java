@@ -1,11 +1,11 @@
 package com.enosh.backtoback.controllers;
 
+import com.enosh.backtoback.common.UserService;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -15,24 +15,15 @@ import static org.springframework.http.HttpMethod.*;
 @RequestMapping("/user")
 public class UserController {
 
-    private final RestTemplate restTemplate;
+    private final UserService userService;
 
-    public UserController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/get")
     public ResponseEntity<Map<String, String>> getData() {
-        JSONObject result = new JSONObject(
-                restTemplate.exchange(
-                        "https://randomuser.me/api",
-                        GET,
-                        null,
-                        String.class
-                ).getBody()
-        )
-                .getJSONArray("results")
-                .getJSONObject(0);
+        JSONObject result = userService.getResult();
 
         JSONObject name = result.getJSONObject("name");
 
